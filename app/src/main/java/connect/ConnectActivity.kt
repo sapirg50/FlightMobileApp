@@ -16,9 +16,12 @@ import com.example.flightmobileapp.R
 import com.example.flightmobileapp.databinding.ActivityConnectBinding
 import control.ControlActivity
 import kotlinx.android.synthetic.main.activity_connect.*
+import java.io.IOException
+import java.net.InetSocketAddress
+import java.net.Socket
 
 
-class ConnectActivity : AppCompatActivity() , View.OnClickListener {
+class ConnectActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var binding: ActivityConnectBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,6 +61,7 @@ class ConnectActivity : AppCompatActivity() , View.OnClickListener {
             ) {
                 connectButton.isEnabled = s.toString().trim { it <= ' ' }.isNotEmpty()
             }
+
             override fun beforeTextChanged(
                 s: CharSequence, start: Int, count: Int,
                 after: Int
@@ -74,20 +78,52 @@ class ConnectActivity : AppCompatActivity() , View.OnClickListener {
     fun connect(view: View) {
         //TODO: update cache - url.text to top (even if url connect not succeed)
         //TODO: Get image from simulator. navigate only if GET was successful
-        val error = Toast.makeText(this,"connection failed, please try again", Toast.LENGTH_SHORT)
-        error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 300)
-        error.show()
-        val intent = Intent(this, ControlActivity("http//:127.0.0.1:5000")::class.java)
-        startActivity(intent)
-
+        if (true || hostUrlReachable(parseUrl(url.text.toString()),2)){
+            val intent = Intent(this, ControlActivity::class.java)
+            intent.putExtra("url",url.text.toString())
+            startActivity(intent)
+        } else {
+            val error = Toast.makeText(this, "connection failed, please try again", Toast.LENGTH_SHORT)
+            error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 300)
+            error.show()
+        }
     }
 
     override fun onClick(view: View) {
         val button = view as Button
         val buttonText = button.text as String
-        if(buttonText.isNotEmpty()) {
+        if (buttonText.isNotEmpty()) {
             val textURL = findViewById<EditText>(R.id.url)
             textURL.setText(buttonText)
         }
+    }
+
+    fun hostUrlReachable(values:Pair<String?,Int?>, timeout: Int): Boolean {
+        if (values.first == null || values.second==null){
+            return false
+        }
+        try {
+            Socket().use { socket ->
+                socket.connect(InetSocketAddress(values.first, values.second!!), timeout)
+                return true
+            }
+        } catch (e: IOException) {
+            return false // Either timeout or unreachable or failed DNS lookup.
+        }
+    }
+
+    fun parseUrl(url: String): Pair<String?, Int?> {
+        var type = "http"
+        if (url.contains("https")) {
+            type += "s"
+        }
+        return try {
+            val host = url.substring(0, url.lastIndexOf(':')).replace("$type://", "")
+            val port = Integer.parseInt(url.substring(url.lastIndexOf(':') + 1, url.indexOf('/',url.lastIndexOf(':') + 1)))
+            Pair(host, port)
+        } catch (e: NumberFormatException) {
+            Pair(null, null)
+        }
+
     }
 }
