@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_control_portrait"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="control.ControlActivity">
+
+    <io.github.controlwear.virtual.joystick.android.JoystickView
+        android:id="@+id/joystickView"
+        android:layout_width="215dp"
+        android:layout_height="214dp"
+        app:JV_backgroundColor="#657881"
+        app:JV_borderColor="#000000"
+        app:JV_borderWidth="4dp"
+        app:JV_buttonColor="#000000"
+        app:JV_buttonSizeRatio="25%"
+        app:JV_fixedCenter="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.121"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.496" />
+
+    <SeekBar
+        android:id="@+id/throttleSeekBar"
+        android:layout_width="220dp"
+        android:layout_height="46dp"
+        android:progress="0"
+        android:rotation="270"
+        app:layout_constraintBottom_toTopOf="@+id/joystickView"
+        app:layout_constraintEnd_toEndOf="@+id/throttleText"
+        app:layout_constraintEnd_toStartOf="@+id/joystickView"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/joystickView"
+        app:layout_constraintVertical_bias="0.505"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/throttleText"
+        android:layout_width="53dp"
+        android:layout_height="22dp"
+        android:layout_marginBottom="288dp"
+        android:gravity="center_horizontal"
+        android:text="@string/prompt_throttle"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.006"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/throttleValue"
+        android:layout_width="40dp"
+        android:layout_height="17dp"
+        android:gravity="center_horizontal"
+        android:text="@string/init_value"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@+id/throttleSeekBar"
+        app:layout_constraintEnd_toEndOf="@+id/throttleText"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/throttleText"
+        app:layout_constraintTop_toBottomOf="@+id/throttleText"
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="MissingConstraints" />
+
+    <SeekBar
+        android:id="@+id/rudderSeekBar"
+        android:layout_width="219dp"
+        android:layout_height="52dp"
+        android:progress="50"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/joystickView"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/joystickView"
+        app:layout_constraintTop_toBottomOf="@id/joystickView" />
+
+    <TextView
+        android:id="@+id/rudderText"
+        android:layout_width="53dp"
+        android:layout_height="22dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="4dp"
+        android:gravity="center_horizontal"
+        android:text="@string/prompt_rudder"
+        android:textAlignment="center"
+        app:layout_constraintStart_toEndOf="@+id/rudderSeekBar"
+        app:layout_constraintTop_toBottomOf="@+id/joystickView" />
+
+    <TextView
+        android:id="@+id/rudderValue"
+        android:layout_width="40dp"
+        android:layout_height="17dp"
+        android:layout_marginTop="4dp"
+        android:gravity="center_horizontal"
+        android:text="@string/init_value"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/rudderText"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/rudderSeekBar"
+        app:layout_constraintStart_toStartOf="@+id/rudderText"
+        app:layout_constraintTop_toBottomOf="@+id/rudderText"
+        app:layout_constraintVertical_bias="0.0" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

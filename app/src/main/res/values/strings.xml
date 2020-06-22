@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">FlightMobileApp</string>
+    <string name="local_host1">Local Host1</string>
+    <string name="local_host2">Local Host2</string>
+    <string name="local_host3">Local Host3</string>
+    <string name="local_host4">Local Host4</string>
+    <string name="local_host5">Local Host5</string>
+    <string name="action_connect">Connect</string>
+    <string name="prompt_url">Type URL</string>
+    <string name="prompt_throttle">Throttle</string>
+    <string name="prompt_rudder">Rudder</string>
+    <string name="init_value">0</string>
+
+</resources>
