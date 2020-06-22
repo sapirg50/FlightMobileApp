@@ -1,10 +1,14 @@
 package architectureexample
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "url_table")
-class URL(val url_path: String, val priority: Int) {
+@Entity
+data class URL(
     @PrimaryKey(autoGenerate = true)
-    var id = 0
-}
+    val uid: Int,
+    @ColumnInfo(name = "url")
+    val url: String,
+    val time:Long
+)

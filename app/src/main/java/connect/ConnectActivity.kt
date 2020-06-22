@@ -15,7 +15,6 @@ import androidx.databinding.DataBindingUtil
 import com.example.flightmobileapp.R
 import com.example.flightmobileapp.databinding.ActivityConnectBinding
 import control.ControlActivity
-import kotlinx.android.synthetic.main.activity_connect.*
 
 
 class ConnectActivity : AppCompatActivity() , View.OnClickListener {
@@ -79,7 +78,6 @@ class ConnectActivity : AppCompatActivity() , View.OnClickListener {
         //error.show()
         val intent = Intent(this, ControlActivity::class.java)
         startActivity(intent)
-
     }
 
     override fun onClick(view: View) {

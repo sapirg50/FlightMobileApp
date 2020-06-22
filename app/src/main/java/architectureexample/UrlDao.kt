@@ -7,17 +7,17 @@ import androidx.room.*
 @Dao
 interface UrlDao {
     @Insert
-    fun insert(url: URL?)
+    fun insert(url: URL)
 
     @Update
-    fun update(url: URL?)
+    fun update(url: URL)
 
     @Delete
-    fun delete(url: URL?)
+    fun delete(url: URL)
 
-    @Query("DELETE FROM url_table")
+    @Query("DELETE FROM URL")
     fun deleteAllUrls()
 
-    @Query("SELECT * FROM url_table ORDER BY priority DESC")
-    fun getAllUrls(): LiveData<List<URL?>?>?
+    @Query("SELECT 5 FROM url ORDER BY time DESC")
+    fun getLastUrls(): LiveData<List<URL>>
 }

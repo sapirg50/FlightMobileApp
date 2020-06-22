@@ -1,3 +1,4 @@
+/*
 
 package architectureexample
 
@@ -12,7 +13,7 @@ class UrlRepository(application: Application?) {
     fun UrlRepository(application: Application?) {
         val database = UrlDatabase.getInstance(application!!)
         urlDao = database!!.urlDao()
-        allUrls = urlDao.getAllUrls()
+        allUrls = urlDao.getLastUrls()
     }
 
     fun insert(url: URL?) {
@@ -71,4 +72,4 @@ class UrlRepository(application: Application?) {
             return null
         }
     }
-}
+}*/

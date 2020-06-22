@@ -1,25 +1,21 @@
 package architectureexample
 
-import android.content.Context
-import android.os.AsyncTask
-import android.provider.ContactsContract.CommonDataKinds.Note
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(entities = [URL::class], version = 1)
 abstract class UrlDatabase : RoomDatabase() {
     abstract fun urlDao(): UrlDao
-    private class PopulateDbAsyncTask(db: UrlDatabase?) :
+    /*private class PopulateDbAsyncTask(db: UrlDatabase?) :
         AsyncTask<Void?, Void?, Void?>() {
         private val urlDao: UrlDao = db!!.urlDao()
         protected override fun doInBackground(vararg voids: Void?): Void? {
             return null
-        }
+        }*/
 
     }
 
+/*
     companion object {
         private var instance: UrlDatabase? = null
 
@@ -45,3 +41,4 @@ abstract class UrlDatabase : RoomDatabase() {
         }
     }
 }
+*/
