@@ -76,7 +76,7 @@ class ConnectActivity : AppCompatActivity() , View.OnClickListener {
         //TODO: Get image from simulator. navigate only if GET was successful
         val error = Toast.makeText(this,"connection failed, please try again", Toast.LENGTH_SHORT)
         error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 300)
-        error.show()
+        //error.show()
         val intent = Intent(this, ControlActivity::class.java)
         startActivity(intent)
 
