@@ -9,11 +9,14 @@ import com.example.flightmobileapp.R
 import kotlinx.android.synthetic.main.activity_control.*
 
 
-class ControlActivity : AppCompatActivity() {
+class ControlActivity(val url:String) : AppCompatActivity() {
     private val STATE_ITEMS = "items"
+
 
     //TODO: Make sure to declare as ArrayList so it's Serializable
     private val mItems: ArrayList<Item>? = null
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,6 +26,8 @@ class ControlActivity : AppCompatActivity() {
             val aileron = kotlin.math.cos(Math.toRadians(angle.toDouble())) * strength / 100
             val elevator = kotlin.math.sin(Math.toRadians(angle.toDouble())) * strength / 100
             //TODO: send to server aileron, elevator
+
+
         }
     }
 

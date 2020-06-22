@@ -15,7 +15,6 @@ import androidx.databinding.DataBindingUtil
 import com.example.flightmobileapp.R
 import com.example.flightmobileapp.databinding.ActivityConnectBinding
 import control.ControlActivity
-import kotlinx.android.synthetic.main.activity_connect.*
 
 
 class ConnectActivity : AppCompatActivity() , View.OnClickListener {
@@ -77,7 +76,7 @@ class ConnectActivity : AppCompatActivity() , View.OnClickListener {
         val error = Toast.makeText(this,"connection failed, please try again", Toast.LENGTH_SHORT)
         error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 300)
         error.show()
-        val intent = Intent(this, ControlActivity::class.java)
+        val intent = Intent(this, ControlActivity("http//:127.0.0.1:5000")::class.java)
         startActivity(intent)
 
     }

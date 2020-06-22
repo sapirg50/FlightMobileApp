@@ -58,8 +58,9 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
 
-
-
+    //this is where we add our 3rd party lib
+    implementation("com.squareup.okhttp3:okhttp:4.7.2")
+    implementation('com.google.code.gson:gson:2.8.6')
 
 
 }
