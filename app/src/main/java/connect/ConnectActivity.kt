@@ -15,6 +15,7 @@ import androidx.databinding.DataBindingUtil
 import com.example.flightmobileapp.R
 import com.example.flightmobileapp.databinding.ActivityConnectBinding
 import control.ControlActivity
+import kotlinx.android.synthetic.main.activity_connect.*
 
 
 class ConnectActivity : AppCompatActivity() , View.OnClickListener {
