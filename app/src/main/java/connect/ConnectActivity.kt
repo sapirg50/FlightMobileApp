@@ -1,7 +1,6 @@
 package connect
 
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,8 +12,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import architectureexample.URL
 import architectureexample.UrlViewModel
 import com.example.flightmobileapp.R
@@ -81,16 +78,16 @@ class ConnectActivity : AppCompatActivity() , View.OnClickListener {
     }
 
     private fun initUrlViewModel() {
-        urlViewModel = ViewModelProviders.of(this).get(UrlViewModel::class.java)
-        urlViewModel.getAllUrls()?.observe(this, Observer<List<URL?>?> {
-            fun onConfigurationChanged(newConfig: Configuration) {
-                super.onConfigurationChanged(newConfig)
-                Toast.makeText(this, "onChanged", Toast.LENGTH_SHORT).show();
-            }
-            //onChanged necessary?
-
-            //TODO: restartButtons
-        })
+        urlViewModel = UrlViewModel(application)
+//        urlViewModel.getAllUrls().observe(this, Observer<List<URL?>?> {
+//            fun onConfigurationChanged(newConfig: Configuration) {
+//                super.onConfigurationChanged(newConfig)
+//                Toast.makeText(this, "onChanged", Toast.LENGTH_SHORT).show();
+//            }
+//            //onChanged necessary?
+//
+//            //TODO: restartButtons
+//        })
     }
 
     fun connect(view: View) {
