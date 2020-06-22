@@ -18,6 +18,6 @@ interface UrlDao {
     @Query("DELETE FROM url_table")
     fun deleteAllUrls()
 
-    @Query("SELECT * FROM url_table ORDER BY priority DESC")
+    //@Query("SELECT * FROM url_table ORDER BY priority DESC")
     fun getAllUrls(): LiveData<List<URL?>?>?
 }

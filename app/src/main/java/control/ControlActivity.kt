@@ -1,6 +1,7 @@
 package control
 
 import android.content.ClipData.Item
+import android.content.res.Configuration
 import android.os.Bundle
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
@@ -14,28 +15,23 @@ import com.example.flightmobileapp.R
 import kotlinx.android.synthetic.main.activity_control.*
 
 
-class ControlActivity(val url:String) : AppCompatActivity() {
+class ControlActivity : AppCompatActivity() {
     private val STATE_ITEMS = "items"
-    private lateinit var urlViewModel:UrlViewModel
+    private var url:String? = null
 
 
     //TODO: Make sure to declare as ArrayList so it's Serializable
     private val mItems: ArrayList<Item>? = null
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_control)
+        url = intent.getStringExtra("url")
         initSeekBar()
         initJoystick()
-        urlViewModel = ViewModelProviders.of(this).get(UrlViewModel::class.java)
-        urlViewModel.getAllUrls()?.observe(this, Observer<List<URL?>?> {
-            //onChanged necessary?
-            //update RecyclerView
-            Toast.makeText(this, "onChanged", Toast.LENGTH_SHORT).show();
-        })
     }
+
 
     private fun initJoystick() {
         joystickView.setOnMoveListener { angle, strength ->

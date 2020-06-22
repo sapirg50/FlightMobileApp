@@ -17,6 +17,7 @@ class UrlRepository(application: Application?) {
 
     fun insert(url: URL?) {
         InsertNoteAsyncTask(urlDao).execute(url)
+        //TODO: check allurl size and delete if needed
     }
 
     fun update(url: URL?) {
