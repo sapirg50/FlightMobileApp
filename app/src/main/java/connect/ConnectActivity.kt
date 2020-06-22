@@ -1,6 +1,7 @@
 package connect
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,6 +13,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import architectureexample.URL
+import architectureexample.UrlViewModel
 import com.example.flightmobileapp.R
 import com.example.flightmobileapp.databinding.ActivityConnectBinding
 import control.ControlActivity
@@ -19,12 +24,16 @@ import control.ControlActivity
 
 class ConnectActivity : AppCompatActivity() , View.OnClickListener {
     private lateinit var binding: ActivityConnectBinding
+    private lateinit var urlViewModel:UrlViewModel
+    private lateinit var buttons: List<Button>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_connect)
         initButtons()
         initConnectButton()
+        initUrlViewModel()
     }
 
     private fun initButtons() {
@@ -43,6 +52,7 @@ class ConnectActivity : AppCompatActivity() , View.OnClickListener {
         button3.setOnClickListener(this)
         button4.setOnClickListener(this)
         button5.setOnClickListener(this)
+        buttons = listOf(button1, button2, button3, button4, button5)
     }
 
     private fun initConnectButton() {
@@ -70,14 +80,52 @@ class ConnectActivity : AppCompatActivity() , View.OnClickListener {
         })
     }
 
+    private fun initUrlViewModel() {
+        urlViewModel = ViewModelProviders.of(this).get(UrlViewModel::class.java)
+        urlViewModel.getAllUrls()?.observe(this, Observer<List<URL?>?> {
+            fun onConfigurationChanged(newConfig: Configuration) {
+                super.onConfigurationChanged(newConfig)
+                Toast.makeText(this, "onChanged", Toast.LENGTH_SHORT).show();
+            }
+            //onChanged necessary?
+
+            //TODO: restartButtons
+        })
+    }
+
     fun connect(view: View) {
         //TODO: update cache - url.text to top (even if url connect not succeed)
         //TODO: Get image from simulator. navigate only if GET was successful
         val error = Toast.makeText(this,"connection failed, please try again", Toast.LENGTH_SHORT)
         error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 300)
         //error.show()
+        addUrl(url.text.toString())
         val intent = Intent(this, ControlActivity::class.java)
+        intent.putExtra("url", "http//:127.0.0.1:5000")
         startActivity(intent)
+    }
+
+    private fun addUrl(urlString: String) {
+        val urlNode = URL(urlString)
+        urlViewModel.insert(urlNode)
+        val allUrls = urlViewModel.getAllUrls()?.value
+        restartButtons(allUrls)
+    }
+
+    private fun restartButtons(urls: List<URL?>?) {
+        if (urls != null) {
+            for((i, url) in urls.withIndex()) {
+                if (url != null) {
+                    buttons[i].text = url.url_path
+                }
+                buttons[i].isVisible = true
+            }
+        }
+        var j = urls?.count() ?: -1
+        while(j < 5) {
+            buttons[j].isVisible = false
+            j++
+        }
     }
 
     override fun onClick(view: View) {
