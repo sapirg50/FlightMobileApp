@@ -1,87 +1,74 @@
-/*
+
 package architectureexample
 
 import android.app.Application
 import android.os.AsyncTask
 import androidx.lifecycle.LiveData
-import retrofit2.http.Url
 
 class UrlRepository(application: Application?) {
-    private val urlDao: UrlDao
-    private val allUrls: LiveData<List<URL>>
+    private lateinit var urlDao:UrlDao
+    private var allUrls: LiveData<List<URL?>?>? = null
+
+    fun UrlRepository(application: Application?) {
+        val database = UrlDatabase.getInstance(application!!)
+        urlDao = database!!.urlDao()
+        allUrls = urlDao.getAllUrls()
+    }
 
     fun insert(url: URL?) {
-        InsertUrlAsyncTask(urlDao).execute(url)
+        InsertNoteAsyncTask(urlDao).execute(url)
     }
 
     fun update(url: URL?) {
-        UpdateUrlAsyncTask(urlDao).execute(url)
+        UpdateNoteAsyncTask(urlDao).execute(url)
     }
 
     fun delete(url: URL?) {
-        DeleteUrlAsyncTask(urlDao).execute(url)
+        DeleteNoteAsyncTask(urlDao).execute(url)
     }
 
-    fun deleteAllUrls() {
-        DeleteAllUrlsAsyncTask(urlDao).execute()
+    fun deleteAllNotes() {
+        DeleteAllNotesAsyncTask(urlDao).execute()
     }
 
-    private class InsertUrlAsyncTask(urlDao: UrlDao) :
-        AsyncTask<Url?, Void?, Void?>() {
-        private val urlDao: UrlDao
-        protected override fun doInBackground(vararg urls: URL): Void? {
+    fun getAllUrls(): LiveData<List<URL?>?>? {
+        return allUrls;
+    }
+
+    private class InsertNoteAsyncTask(urlDao: UrlDao) :
+        AsyncTask<URL?, Void?, Void?>() {
+        private val urlDao: UrlDao = urlDao
+        protected override fun doInBackground(vararg urls: URL?): Void? {
             urlDao.insert(urls[0])
             return null
         }
-
-        init {
-            this.urlDao = urlDao
-        }
     }
 
-    private class UpdateUrlAsyncTask(urlDao: UrlDao) :
-        AsyncTask<Url?, Void?, Void?>() {
-        private val urlDao: UrlDao
-        protected override fun doInBackground(vararg urls: URL): Void? {
+    private class UpdateNoteAsyncTask(urlDao: UrlDao) :
+        AsyncTask<URL?, Void?, Void?>() {
+        private val urlDao: UrlDao = urlDao
+        protected override fun doInBackground(vararg urls: URL?): Void? {
             urlDao.update(urls[0])
             return null
         }
-
-        init {
-            this.urlDao = urlDao
-        }
     }
 
-    private class DeleteUrlAsyncTask(urlDao: UrlDao) :
-        AsyncTask<Url?, Void?, Void?>() {
-        private val urlDao: UrlDao
-        protected override fun doInBackground(vararg urls: URL): Void? {
+    private class DeleteNoteAsyncTask(urlDao: UrlDao) :
+        AsyncTask<URL?, Void?, Void?>() {
+        private val urlDao: UrlDao = urlDao
+        protected override fun doInBackground(vararg urls: URL?): Void? {
             urlDao.delete(urls[0])
             return null
         }
-
-        init {
-            this.urlDao = urlDao
-        }
     }
 
-    private class DeleteAllUrlsAsyncTask(urlDao: UrlDao) :
+
+    private class DeleteAllNotesAsyncTask(urlDao: UrlDao) :
         AsyncTask<Void?, Void?, Void?>() {
-        private val urlDao: UrlDao
-        protected override fun doInBackground(vararg voids: Void): Void? {
+        private var urlDao: UrlDao = urlDao
+        protected override fun doInBackground(vararg voids: Void?): Void? {
             urlDao.deleteAllUrls()
             return null
         }
-
-        init {
-            this.urlDao = urlDao
-        }
-    }
-
-    init {
-        val database: UrlDatabase = UrlDatabase.getInstance(application)
-        urlDao = database.urlDao()
-        allUrls = urlDao.getAllUrls()
     }
 }
-*/

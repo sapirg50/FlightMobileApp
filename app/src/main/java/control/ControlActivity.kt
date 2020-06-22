@@ -4,13 +4,19 @@ import android.content.ClipData.Item
 import android.os.Bundle
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import architectureexample.URL
+import architectureexample.UrlViewModel
 import com.example.flightmobileapp.R
 import kotlinx.android.synthetic.main.activity_control.*
 
 
 class ControlActivity(val url:String) : AppCompatActivity() {
     private val STATE_ITEMS = "items"
+    private lateinit var urlViewModel:UrlViewModel
 
 
     //TODO: Make sure to declare as ArrayList so it's Serializable
@@ -22,6 +28,16 @@ class ControlActivity(val url:String) : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_control)
         initSeekBar()
+        initJoystick()
+        urlViewModel = ViewModelProviders.of(this).get(UrlViewModel::class.java)
+        urlViewModel.getAllUrls()?.observe(this, Observer<List<URL?>?> {
+            //onChanged necessary?
+            //update RecyclerView
+            Toast.makeText(this, "onChanged", Toast.LENGTH_SHORT).show();
+        })
+    }
+
+    private fun initJoystick() {
         joystickView.setOnMoveListener { angle, strength ->
             val aileron = kotlin.math.cos(Math.toRadians(angle.toDouble())) * strength / 100
             val elevator = kotlin.math.sin(Math.toRadians(angle.toDouble())) * strength / 100
@@ -47,8 +63,6 @@ class ControlActivity(val url:String) : AppCompatActivity() {
 
             }
         })
-
-
 
         rudderSeekBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(
