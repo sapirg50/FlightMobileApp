@@ -68,9 +68,20 @@ class ControlActivity : AppCompatActivity() {
         joystickView.setOnMoveListener({ angle, strength ->
             val aileron = kotlin.math.cos(Math.toRadians(angle.toDouble())) * strength / 100
             val elevator = kotlin.math.sin(Math.toRadians(angle.toDouble())) * strength / 100
+            if (!this.client.setFromJoystick(aileron, elevator)){
+                this.errorPopup()
+            }
 
-            this.client.setFromJoystick(aileron, elevator)
         }, 30)
+    }
+
+    private fun errorPopup() {
+        runOnUiThread {
+        val error = Toast.makeText(this, "Failed to send data to server" +
+                "\nGo back and try inserting another host address.", Toast.LENGTH_SHORT)
+        error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 300)
+        error.show()
+        }
     }
 
     private fun initSeekBar() {
@@ -83,7 +94,9 @@ class ControlActivity : AppCompatActivity() {
                 val throttle = progress.toDouble() / 100
                 throttleValue.text = throttle.toString()
                 //TODO: send to server (progress.toFloat() / 10).toString()
-                client.setThrottle(throttle)
+                if (!client.setThrottle(throttle)){
+                    errorPopup()
+                }
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
@@ -99,7 +112,9 @@ class ControlActivity : AppCompatActivity() {
                 val rudder = (progress.toDouble() - 50) / 50
                 rudderValue.text = rudder.toString()
                 //TODO: send to server
-                client.setRudder(rudder)
+                if(client.setRudder(rudder)){
+                    errorPopup()
+                }
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
@@ -114,11 +129,18 @@ class ControlActivity : AppCompatActivity() {
             this.imageQueue.offer(answer.get())
             this.numOfNullImages = 0
         } else {
-            if (this.numOfNullImages > 10) {
-                val error =
-                    Toast.makeText(this, "failed to get screenshots from server\n", Toast.LENGTH_SHORT)
-                error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 300)
-                error.show()
+            if (this.numOfNullImages >= 1 && this.imageQueue.isEmpty()) {
+                runOnUiThread {
+                    val error = Toast.makeText(
+                        this,
+                        "Failed to get screenshots from server" +
+                                "\nGo back and try inserting another host address.",
+                        Toast.LENGTH_SHORT
+                    )
+                    error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 300)
+                    error.show()
+                }
+                this.numOfNullImages = 0
             }
             this.numOfNullImages++
         }

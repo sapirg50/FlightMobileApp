@@ -7,59 +7,66 @@ import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 class Client(val url: String) {
-    private val defaultBitmap = null
+    private var unsuccessfulRequests: Int = 0
     private var command: Command = Command(0.0, 0.0, 0.0, 0.0)
-    private val httpClient = OkHttpClient()/*.Builder()
-        .callTimeout(20,TimeUnit.SECONDS)
-        .connectTimeout(20, TimeUnit.SECONDS)
-        .writeTimeout(20, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .build()*/
+    private val httpClient = OkHttpClient().newBuilder().callTimeout(5, TimeUnit.SECONDS).build()
 
-    fun setCommand(command: Command) {
+    fun setCommand(command: Command): Boolean {
         this.command = command
-        this.sendCommand()
+        return this.sendCommand()
     }
 
-    fun setFromJoystick(aileron: Double, elevator: Double) {
+    fun setFromJoystick(aileron: Double, elevator: Double): Boolean {
         this.command.setAileron(aileron)
         this.command.setElevator(elevator)
-        this.sendCommand()
+        return this.sendCommand()
     }
 
-    fun setRudder(rudder: Double) {
+    fun setRudder(rudder: Double): Boolean {
         this.command.setRudder(rudder)
-        this.sendCommand()
+        return this.sendCommand()
     }
 
-    fun setThrottle(throttle: Double) {
+    fun setThrottle(throttle: Double): Boolean {
         this.command.setThrottle(throttle)
-        this.sendCommand()
+        return this.sendCommand()
     }
 
 
-    private fun sendCommand() {
+    private fun sendCommand(): Boolean {
         val gson = GsonBuilder().create()
         val jsonCommand = gson.toJson(this.command)
         val request = Request.Builder().post(jsonCommand.toRequestBody(MEDIA_TYPE_MARKDOWN))
             .url(this.url + "/api/command").build()
         httpClient.newCall(request).enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
+                if (response.code == 200 && response.code==409) {
+                    unsuccessfulRequests = 0
+                } else {
+                    unsuccessfulRequests++
+                }
                 println("good" + response.body)
             }
 
             override fun onFailure(call: Call, e: IOException) {
                 println("failed: ${call.request()}")
                 println(e.message)
+                unsuccessfulRequests++
             }
         })
+        val bool = unsuccessfulRequests < 50
+        if (!bool){
+            unsuccessfulRequests=0
+        }
+        return bool
 
     }
 
-    fun getImage():Future<Bitmap>{
-        val answer:Future<Bitmap> = Future()
+    fun getImage(): Future<Bitmap> {
+        val answer: Future<Bitmap> = Future()
         val request = Request.Builder().get()
             .url(this.url + "/api/screenshot").build()
         httpClient.newCall(request).enqueue(object : Callback {
@@ -67,11 +74,12 @@ class Client(val url: String) {
                 try {
                     val byteStream = response.body?.byteStream()
                     answer.set(BitmapFactory.decodeStream(byteStream))
-                } catch (e:Exception){
+                } catch (e: Exception) {
                     answer.set(null)
                     println(e.message)
                 }
             }
+
             override fun onFailure(call: Call, e: IOException) {
                 println("failed: ${call.request()}")
                 println(e.message)
