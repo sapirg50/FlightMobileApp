@@ -26,6 +26,10 @@ class UrlViewModel(application: Application, context:Context) : AndroidViewModel
         db.urlDao().delete(url)
     }
 
+    fun deleteAll() {
+        db.urlDao().deleteAllUrls()
+    }
+
     fun getAllUrls(): List<URL> {
         return db.urlDao().getLastUrls()
     }

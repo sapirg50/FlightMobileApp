@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -35,6 +37,11 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
         initButtons()
         initConnectButton()
         initUrlViewModel()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main, menu);
+        return super.onCreateOptionsMenu(menu)
     }
 
     private fun initButtons() {
@@ -83,7 +90,7 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun initUrlViewModel() {
-        urlViewModel = UrlViewModel(application,applicationContext)
+        urlViewModel = UrlViewModel(application, applicationContext)
         /*urlViewModel.getAllUrls().observe(this, Observer<List<URL?>?> {
             fun onConfigurationChanged(newConfig: Configuration) {
                 super.onConfigurationChanged(newConfig)
@@ -92,14 +99,20 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
             //onChanged necessary?*/
         restartButtons(urlViewModel.getAllUrls())
 
-            //TODO: restartButtons
-        }
+        //TODO: restartButtons
+    }
+
+    fun deleteAll(item: MenuItem) {
+        urlViewModel.deleteAll()
+        val allUrls = urlViewModel.getAllUrls()
+        restartButtons(allUrls)
+    }
 
     fun connect(view: View) {
         //TODO: update cache - url.text to top (even if url connect not succeed)
         //TODO: Get image from simulator. navigate only if GET was successful
 
-        if (true||hostUrlReachable(parseUrl(url.text.toString()), 2)) {
+        if (true || hostUrlReachable(parseUrl(url.text.toString()), 2)) {
             val intent = Intent(this, ControlActivity::class.java)
             addUrl(url.text.toString())
             intent.putExtra("url", url.text.toString())
@@ -126,11 +139,11 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
                 buttons[i].text = url.path
                 buttons[i].isVisible = true
             }
-            /*var i = 5
-            while(i>urls.count()){
-                buttons[i].isVisible = false
+            var i = 5
+            while (i > urls.count()) {
+                buttons[i - 1].isVisible = false
                 i--;
-            }*/
+            }
         }
     }
 
@@ -168,8 +181,9 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
             val port = Integer.parseInt(
                 url.substring(
                     url.lastIndexOf(':') + 1,
-                    url.length)
+                    url.length
                 )
+            )
             Pair(host, port)
         } catch (e: Exception) {
             Pair(null, null)

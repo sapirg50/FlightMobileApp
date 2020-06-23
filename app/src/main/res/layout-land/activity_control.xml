@@ -8,10 +8,22 @@
     android:layout_height="match_parent"
     tools:context="control.ControlActivity">
 
+    <ImageView
+        android:id="@+id/screenshot"
+        android:layout_width="398dp"
+        android:layout_height="274dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.123"
+        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
     <io.github.controlwear.virtual.joystick.android.JoystickView
         android:id="@+id/joystickView"
-        android:layout_width="215dp"
-        android:layout_height="214dp"
+        android:layout_width="199dp"
+        android:layout_height="197dp"
         app:JV_backgroundColor="#657881"
         app:JV_borderColor="#000000"
         app:JV_borderWidth="4dp"
@@ -20,10 +32,10 @@
         app:JV_fixedCenter="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.121"
+        app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.496" />
+        app:layout_constraintVertical_bias="0.267" />
 
     <SeekBar
         android:id="@+id/throttleSeekBar"
@@ -37,20 +49,20 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/joystickView"
-        app:layout_constraintVertical_bias="0.505"
+        app:layout_constraintVertical_bias="0.448"
         tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/throttleText"
         android:layout_width="53dp"
         android:layout_height="22dp"
-        android:layout_marginBottom="288dp"
+        android:layout_marginBottom="308dp"
         android:gravity="center_horizontal"
         android:text="@string/prompt_throttle"
         android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.006"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -75,28 +87,29 @@
         android:progress="50"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/joystickView"
+        app:layout_constraintEnd_toStartOf="@+id/screenshot"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/joystickView"
-        app:layout_constraintTop_toBottomOf="@id/joystickView" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/joystickView"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/rudderText"
         android:layout_width="53dp"
         android:layout_height="22dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:gravity="center_horizontal"
         android:text="@string/prompt_rudder"
         android:textAlignment="center"
+        app:layout_constraintEnd_toStartOf="@+id/rudderSeekBar"
         app:layout_constraintStart_toEndOf="@+id/rudderSeekBar"
-        app:layout_constraintTop_toBottomOf="@+id/joystickView" />
+        app:layout_constraintTop_toBottomOf="@+id/rudderSeekBar" />
 
     <TextView
         android:id="@+id/rudderValue"
         android:layout_width="40dp"
         android:layout_height="17dp"
-        android:layout_marginTop="4dp"
         android:gravity="center_horizontal"
         android:text="@string/init_value"
         android:textAlignment="center"

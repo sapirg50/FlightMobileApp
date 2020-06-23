@@ -10,5 +10,6 @@
     <string name="prompt_throttle">Throttle</string>
     <string name="prompt_rudder">Rudder</string>
     <string name="init_value">0</string>
+    <string name="delete_all">Delete all</string>
 
 </resources>
