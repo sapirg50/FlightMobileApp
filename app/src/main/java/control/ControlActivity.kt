@@ -1,27 +1,20 @@
 package control
 
-import android.content.ClipData.Item
 import android.os.Bundle
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import architectureexample.URL
-import architectureexample.UrlViewModel
 import com.example.flightmobileapp.R
 import kotlinx.android.synthetic.main.activity_control.*
+import java.util.*
+import kotlin.concurrent.schedule
 
 
 class ControlActivity : AppCompatActivity() {
-    private val STATE_ITEMS = "items"
-    private lateinit var urlViewModel: UrlViewModel
     private lateinit var client: Client
-
-
-    //TODO: Make sure to declare as ArrayList so it's Serializable
-    private val mItems: ArrayList<Item>? = null
+    private val timer = Timer("getImages", false).schedule(250, 1000) {
+        getScreenshot()
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,21 +23,32 @@ class ControlActivity : AppCompatActivity() {
         this.client = Client(intent.getStringExtra("url")!!)
         initSeekBar()
         initJoystick()
-        urlViewModel = ViewModelProviders.of(this).get(UrlViewModel::class.java)
-        urlViewModel.getAllUrls()?.observe(this, Observer<List<URL?>?> {
-            //onChanged necessary?
-            //update RecyclerView
-            Toast.makeText(this, "onChanged", Toast.LENGTH_SHORT).show();
-        })
+        timer.run()
     }
 
+    override fun onStop() {
+        super.onStop()
+        timer.cancel()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        timer.cancel()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        timer.cancel()
+    }
+
+
     private fun initJoystick() {
-        joystickView.setOnMoveListener { angle, strength ->
+        joystickView.setOnMoveListener({ angle, strength ->
             val aileron = kotlin.math.cos(Math.toRadians(angle.toDouble())) * strength / 100
             val elevator = kotlin.math.sin(Math.toRadians(angle.toDouble())) * strength / 100
-            //TODO: send to server aileron, elevator
+
             this.client.setFromJoystick(aileron, elevator)
-        }
+        },30)
     }
 
     private fun initSeekBar() {
@@ -78,5 +82,12 @@ class ControlActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar) {}
         })
 
+    }
+
+    private fun getScreenshot() {
+        val answer = this.client.getImage()
+        runOnUiThread {
+            screenshot.setImageBitmap(answer.get())
+        }
     }
 }

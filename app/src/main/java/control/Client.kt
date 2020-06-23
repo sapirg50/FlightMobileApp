@@ -1,5 +1,7 @@
 package control
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import com.google.gson.GsonBuilder
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
@@ -52,6 +54,28 @@ class Client(val url: String) {
                 println(e.message)
             }
         })
+    }
+
+    fun getImage():Future<Bitmap>{
+        val answer:Future<Bitmap> = Future()
+        val request = Request.Builder().get()
+            .url(this.url + "/api/screenshot").build()
+        httpClient.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                try {
+                    val byteStream = response.body?.byteStream()
+                    answer.set(BitmapFactory.decodeStream(byteStream))
+                } catch (e:Exception){
+                    println(e.message)
+                }
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                println("failed: ${call.request()}")
+                println(e.message)
+            }
+        })
+        return answer
     }
 
     companion object {

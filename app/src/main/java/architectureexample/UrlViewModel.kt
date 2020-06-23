@@ -1,36 +1,32 @@
 package architectureexample
 
 import android.app.Application
-import android.provider.ContactsContract.CommonDataKinds.Note
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 
 
-class UrlViewModel(application: Application) : AndroidViewModel(application) {
-    private lateinit var repository: UrlRepository
-    private var allUrls: LiveData<List<URL?>?>? = null
+class UrlViewModel(application: Application, context:Context) : AndroidViewModel(application) {
+    private val db = UrlDatabase.getInstance(context)!!
+    //private var allUrls: LiveData<List<URL>> = db.urlDao().getLastUrls()
 
-    fun UrlViewModel(application: Application) {
-        repository = UrlRepository(application)
-        allUrls = repository.getAllUrls()
-    }
-    fun insert(url: URL?) {
-        repository.insert(url)
-    }
-
-    fun update(url: URL?) {
-        repository.update(url)
+    fun insert(url: URL) {
+        url.time = System.currentTimeMillis() / 1000
+        if (db.urlDao().exists(url.path)) {
+            this.update(url)
+        }else {
+            db.urlDao().insert(url)
+        }
     }
 
-    fun delete(url: URL?) {
-        repository.delete(url)
+    private fun update(url: URL) {
+        db.urlDao().update(url)
     }
 
-    fun deleteAllNotes() {
-        repository.deleteAllNotes()
+    fun delete(url: URL) {
+        db.urlDao().delete(url)
     }
 
-    fun getAllUrls(): LiveData<List<URL?>?>? {
-        return allUrls
+    fun getAllUrls(): List<URL> {
+        return db.urlDao().getLastUrls()
     }
 }

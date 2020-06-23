@@ -12,6 +12,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
+import architectureexample.URL
+import architectureexample.UrlViewModel
 import com.example.flightmobileapp.R
 import com.example.flightmobileapp.databinding.ActivityConnectBinding
 import control.ControlActivity
@@ -23,12 +25,16 @@ import java.net.Socket
 
 class ConnectActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var binding: ActivityConnectBinding
+    private lateinit var urlViewModel: UrlViewModel
+    private lateinit var buttons: List<Button>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_connect)
         initButtons()
         initConnectButton()
+        initUrlViewModel()
     }
 
     private fun initButtons() {
@@ -47,6 +53,7 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
         button3.setOnClickListener(this)
         button4.setOnClickListener(this)
         button5.setOnClickListener(this)
+        buttons = listOf(button1, button2, button3, button4, button5)
     }
 
     private fun initConnectButton() {
@@ -66,26 +73,64 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
                 s: CharSequence, start: Int, count: Int,
                 after: Int
             ) {
-                // TODO Auto-generated method stub
+
             }
 
             override fun afterTextChanged(s: Editable) {
-                // TODO Auto-generated method stub -- check if valid URL
+
             }
         })
     }
 
+    private fun initUrlViewModel() {
+        urlViewModel = UrlViewModel(application,applicationContext)
+        /*urlViewModel.getAllUrls().observe(this, Observer<List<URL?>?> {
+            fun onConfigurationChanged(newConfig: Configuration) {
+                super.onConfigurationChanged(newConfig)
+                Toast.makeText(this, "onChanged", Toast.LENGTH_SHORT).show();
+            }
+            //onChanged necessary?*/
+        restartButtons(urlViewModel.getAllUrls())
+
+            //TODO: restartButtons
+        }
+
     fun connect(view: View) {
         //TODO: update cache - url.text to top (even if url connect not succeed)
         //TODO: Get image from simulator. navigate only if GET was successful
-        if (true || hostUrlReachable(parseUrl(url.text.toString()),2)){
+
+        if (true||hostUrlReachable(parseUrl(url.text.toString()), 2)) {
             val intent = Intent(this, ControlActivity::class.java)
-            intent.putExtra("url",url.text.toString())
+            addUrl(url.text.toString())
+            intent.putExtra("url", url.text.toString())
             startActivity(intent)
         } else {
-            val error = Toast.makeText(this, "connection failed, please try again", Toast.LENGTH_SHORT)
+            val error =
+                Toast.makeText(this, "connection failed, please try again", Toast.LENGTH_SHORT)
             error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 300)
             error.show()
+        }
+
+    }
+
+    private fun addUrl(urlString: String) {
+        val urlNode = URL(urlString)
+        urlViewModel.insert(urlNode)
+        val allUrls = urlViewModel.getAllUrls()
+        restartButtons(allUrls)
+    }
+
+    private fun restartButtons(urls: List<URL>?) {
+        if (urls != null) {
+            for ((i, url) in urls.withIndex()) {
+                buttons[i].text = url.path
+                buttons[i].isVisible = true
+            }
+            /*var i = 5
+            while(i>urls.count()){
+                buttons[i].isVisible = false
+                i--;
+            }*/
         }
     }
 
@@ -98,8 +143,9 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    fun hostUrlReachable(values:Pair<String?,Int?>, timeout: Int): Boolean {
-        if (values.first == null || values.second==null){
+    fun hostUrlReachable(values: Pair<String?, Int?>, timeout: Int): Boolean {
+        return true
+        if (values.first == null || values.second == null) {
             return false
         }
         try {
@@ -119,9 +165,13 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
         }
         return try {
             val host = url.substring(0, url.lastIndexOf(':')).replace("$type://", "")
-            val port = Integer.parseInt(url.substring(url.lastIndexOf(':') + 1, url.indexOf('/',url.lastIndexOf(':') + 1)))
+            val port = Integer.parseInt(
+                url.substring(
+                    url.lastIndexOf(':') + 1,
+                    url.length)
+                )
             Pair(host, port)
-        } catch (e: NumberFormatException) {
+        } catch (e: Exception) {
             Pair(null, null)
         }
 
