@@ -2,6 +2,7 @@ package connect
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.StrictMode
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Gravity
@@ -20,14 +21,11 @@ import com.example.flightmobileapp.R
 import com.example.flightmobileapp.databinding.ActivityConnectBinding
 import control.ControlActivity
 import kotlinx.android.synthetic.main.activity_connect.*
-import java.io.IOException
-import java.net.InetSocketAddress
-import java.net.Socket
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.util.concurrent.TimeUnit
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 
 class ConnectActivity : AppCompatActivity(), View.OnClickListener {
@@ -109,13 +107,15 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     fun connect(view: View) {
-        val urlText:String = url.text.toString()
-        if(isURLValid(urlText)) {
-            if (hostUrlReachable(parseUrl(url.text.toString()), 2)) {
-
+        var urlText: String = url.text.toString()
+        if (isURLValid(urlText)) {
+            if (!urlText.startsWith("http://")) {
+                urlText = "http:// ${urlText}"
+            }
+            if (hostUrlReachable(urlText)) {
                 val intent = Intent(this, ControlActivity::class.java)
                 addUrl(url.text.toString())
-                intent.putExtra("url", url.text.toString())
+                intent.putExtra("url", urlText)
                 startActivity(intent)
             } else {
                 val error =
@@ -127,21 +127,7 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
             val error = Toast.makeText(this, "invalid url, please try again", Toast.LENGTH_SHORT)
             error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 1000)
             error.show()
-        if (hostUrlReachable(url.text.toString())) {
-            val intent = Intent(this, ControlActivity::class.java)
-            addUrl(url.text.toString())
-            intent.putExtra("url", url.text.toString())
-            startActivity(intent)
-        } else {
-            runOnUiThread {
-                val error =
-                    Toast.makeText(this, "connection failed, please try again", Toast.LENGTH_SHORT)
-                error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 300)
-                error.show()
-            }
         }
-
-
     }
 
     private fun addUrl(urlString: String) {
@@ -178,13 +164,8 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
         val oldPolicy = StrictMode.getThreadPolicy()
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
-        var baseUrl = ""
-        if (!url.startsWith("http://")) {
-            baseUrl = "http://"
-        }
-        baseUrl += url
         val request =
-            Request.Builder().get().url(baseUrl).build()
+            Request.Builder().get().url(url).build()
         return try {
             this.httpClient.newCall(request).execute()
             true
@@ -194,26 +175,6 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
             StrictMode.setThreadPolicy(oldPolicy)
         }
 
-
-    }
-
-    private fun parseUrl(url: String): Pair<String?, Int?> {
-        var type = "http"
-        if (url.contains("https")) {
-            type += "s"
-        }
-        return try {
-            val host = url.substring(0, url.lastIndexOf(':')).replace("$type://", "")
-            val port = Integer.parseInt(
-                url.substring(
-                    url.lastIndexOf(':') + 1,
-                    url.length
-                )
-            )
-            Pair(host, port)
-        } catch (e: Exception) {
-            Pair(null, null)
-        }
 
     }
 

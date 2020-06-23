@@ -43,7 +43,7 @@ class Client(val url: String) {
             .url(this.url + "/api/command").build()
         httpClient.newCall(request).enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
-                if (response.code == 200 && response.code==409) {
+                if (response.code == 200 || response.code==409) {
                     unsuccessfulRequests = 0
                 } else {
                     unsuccessfulRequests++

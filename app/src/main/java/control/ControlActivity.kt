@@ -23,6 +23,7 @@ class ControlActivity : AppCompatActivity() {
     private val imageQueue: BlockingQueue<Bitmap> = LinkedBlockingQueue()
     private var stop: Boolean = false
     private var numOfNullImages = 0
+    private var errorPopped = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,19 +69,26 @@ class ControlActivity : AppCompatActivity() {
         joystickView.setOnMoveListener({ angle, strength ->
             val aileron = kotlin.math.cos(Math.toRadians(angle.toDouble())) * strength / 100
             val elevator = kotlin.math.sin(Math.toRadians(angle.toDouble())) * strength / 100
-            if (!this.client.setFromJoystick(aileron, elevator)){
+            if (!this.client.setFromJoystick(aileron, elevator)) {
                 this.errorPopup()
+            } else {
+                errorPopped = false
             }
 
         }, 30)
     }
 
     private fun errorPopup() {
-        runOnUiThread {
-        val error = Toast.makeText(this, "Failed to send data to server" +
-                "\nGo back and try inserting another host address.", Toast.LENGTH_SHORT)
-        error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 300)
-        error.show()
+        if (!errorPopped) {
+            runOnUiThread {
+                val error = Toast.makeText(
+                    this, "Failed to send data to server" +
+                            "\nGo back and try inserting another host address.", Toast.LENGTH_SHORT
+                )
+                error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 300)
+                error.show()
+            }
+            errorPopped = true
         }
     }
 
@@ -94,8 +102,10 @@ class ControlActivity : AppCompatActivity() {
                 val throttle = progress.toDouble() / 100
                 throttleValue.text = throttle.toString()
                 //TODO: send to server (progress.toFloat() / 10).toString()
-                if (!client.setThrottle(throttle)){
+                if (!client.setThrottle(throttle)) {
                     errorPopup()
+                }else {
+                    errorPopped = false
                 }
             }
 
@@ -112,8 +122,10 @@ class ControlActivity : AppCompatActivity() {
                 val rudder = (progress.toDouble() - 50) / 50
                 rudderValue.text = rudder.toString()
                 //TODO: send to server
-                if(client.setRudder(rudder)){
+                if (!client.setRudder(rudder)) {
                     errorPopup()
+                }else {
+                    errorPopped = false
                 }
             }
 
