@@ -25,12 +25,18 @@ import java.net.InetSocketAddress
 import java.net.Socket
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import java.util.concurrent.TimeUnit
 
 
 class ConnectActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var binding: ActivityConnectBinding
     private lateinit var urlViewModel: UrlViewModel
     private lateinit var buttons: List<Button>
+    private val httpClient = OkHttpClient().newBuilder()
+        .retryOnConnectionFailure(false)
+        .connectTimeout(8, TimeUnit.SECONDS).build()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,15 +99,7 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun initUrlViewModel() {
         urlViewModel = UrlViewModel(application, applicationContext)
-        /*urlViewModel.getAllUrls().observe(this, Observer<List<URL?>?> {
-            fun onConfigurationChanged(newConfig: Configuration) {
-                super.onConfigurationChanged(newConfig)
-                Toast.makeText(this, "onChanged", Toast.LENGTH_SHORT).show();
-            }
-            //onChanged necessary?*/
         restartButtons(urlViewModel.getAllUrls())
-
-        //TODO: restartButtons
     }
 
     fun deleteAll(item: MenuItem) {
@@ -129,6 +127,18 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
             val error = Toast.makeText(this, "invalid url, please try again", Toast.LENGTH_SHORT)
             error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 1000)
             error.show()
+        if (hostUrlReachable(url.text.toString())) {
+            val intent = Intent(this, ControlActivity::class.java)
+            addUrl(url.text.toString())
+            intent.putExtra("url", url.text.toString())
+            startActivity(intent)
+        } else {
+            runOnUiThread {
+                val error =
+                    Toast.makeText(this, "connection failed, please try again", Toast.LENGTH_SHORT)
+                error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 300)
+                error.show()
+            }
         }
 
 
@@ -164,22 +174,30 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    fun hostUrlReachable(values: Pair<String?, Int?>, timeout: Int): Boolean {
-        return true
-        if (values.first == null || values.second == null) {
-            return false
+    private fun hostUrlReachable(url: String): Boolean {
+        val oldPolicy = StrictMode.getThreadPolicy()
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
+        var baseUrl = ""
+        if (!url.startsWith("http://")) {
+            baseUrl = "http://"
         }
-        try {
-            Socket().use { socket ->
-                socket.connect(InetSocketAddress(values.first, values.second!!), timeout)
-                return true
-            }
-        } catch (e: IOException) {
-            return false // Either timeout or unreachable or failed DNS lookup.
+        baseUrl += url
+        val request =
+            Request.Builder().get().url(baseUrl).build()
+        return try {
+            this.httpClient.newCall(request).execute()
+            true
+        } catch (e: Exception) {
+            false
+        } finally {
+            StrictMode.setThreadPolicy(oldPolicy)
         }
+
+
     }
 
-    fun parseUrl(url: String): Pair<String?, Int?> {
+    private fun parseUrl(url: String): Pair<String?, Int?> {
         var type = "http"
         if (url.contains("https")) {
             type += "s"
