@@ -9,6 +9,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 
 class Client(val url: String) {
+    private val defaultBitmap = null
     private var command: Command = Command(0.0, 0.0, 0.0, 0.0)
     private val httpClient = OkHttpClient()/*.Builder()
         .callTimeout(20,TimeUnit.SECONDS)
@@ -54,6 +55,7 @@ class Client(val url: String) {
                 println(e.message)
             }
         })
+
     }
 
     fun getImage():Future<Bitmap>{
@@ -66,13 +68,14 @@ class Client(val url: String) {
                     val byteStream = response.body?.byteStream()
                     answer.set(BitmapFactory.decodeStream(byteStream))
                 } catch (e:Exception){
+                    answer.set(null)
                     println(e.message)
                 }
             }
-
             override fun onFailure(call: Call, e: IOException) {
                 println("failed: ${call.request()}")
                 println(e.message)
+                answer.set(null)
             }
         })
         return answer

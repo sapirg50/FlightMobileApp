@@ -2,8 +2,10 @@ package control
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.view.Gravity
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.flightmobileapp.R
 import kotlinx.android.synthetic.main.activity_control.*
@@ -20,6 +22,7 @@ class ControlActivity : AppCompatActivity() {
     private val timer: Timer = Timer("getImages", false)
     private val imageQueue: BlockingQueue<Bitmap> = LinkedBlockingQueue()
     private var stop: Boolean = false
+    private var numOfNullImages = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,7 +110,18 @@ class ControlActivity : AppCompatActivity() {
 
     private fun getScreenshot() {
         val answer = this.client.getImage()
-        this.imageQueue.offer(answer.get())
+        if (answer.get() != null) {
+            this.imageQueue.offer(answer.get())
+            this.numOfNullImages = 0
+        } else {
+            if (this.numOfNullImages > 10) {
+                val error =
+                    Toast.makeText(this, "failed to get screenshots from server\n", Toast.LENGTH_SHORT)
+                error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 300)
+                error.show()
+            }
+            this.numOfNullImages++
+        }
     }
 
     private fun displayScreenshots() {

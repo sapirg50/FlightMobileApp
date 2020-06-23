@@ -109,9 +109,6 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     fun connect(view: View) {
-        //TODO: update cache - url.text to top (even if url connect not succeed)
-        //TODO: Get image from simulator. navigate only if GET was successful
-
         if (true || hostUrlReachable(parseUrl(url.text.toString()), 2)) {
             val intent = Intent(this, ControlActivity::class.java)
             addUrl(url.text.toString())
