@@ -23,6 +23,8 @@ import kotlinx.android.synthetic.main.activity_connect.*
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 
 class ConnectActivity : AppCompatActivity(), View.OnClickListener {
@@ -109,17 +111,26 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     fun connect(view: View) {
-        if (true || hostUrlReachable(parseUrl(url.text.toString()), 2)) {
-            val intent = Intent(this, ControlActivity::class.java)
-            addUrl(url.text.toString())
-            intent.putExtra("url", url.text.toString())
-            startActivity(intent)
+        val urlText:String = url.text.toString()
+        if(isURLValid(urlText)) {
+            if (hostUrlReachable(parseUrl(url.text.toString()), 2)) {
+
+                val intent = Intent(this, ControlActivity::class.java)
+                addUrl(url.text.toString())
+                intent.putExtra("url", url.text.toString())
+                startActivity(intent)
+            } else {
+                val error =
+                    Toast.makeText(this, "connection failed, please try again", Toast.LENGTH_SHORT)
+                error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 300)
+                error.show()
+            }
         } else {
-            val error =
-                Toast.makeText(this, "connection failed, please try again", Toast.LENGTH_SHORT)
-            error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 300)
+            val error = Toast.makeText(this, "invalid url, please try again", Toast.LENGTH_SHORT)
+            error.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 1000)
             error.show()
         }
+
 
     }
 
@@ -186,5 +197,12 @@ class ConnectActivity : AppCompatActivity(), View.OnClickListener {
             Pair(null, null)
         }
 
+    }
+
+    private fun isURLValid(urlSyntax: String): Boolean {
+        val expression = "(http://)?[^:, ]*:[1-9][0-9]{0,4}"
+        val pattern: Pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE)
+        val matcher: Matcher = pattern.matcher(urlSyntax)
+        return matcher.matches()
     }
 }
